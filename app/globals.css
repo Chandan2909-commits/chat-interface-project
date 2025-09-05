@@ -382,3 +382,61 @@ body {
     transform: scale(1.2);
   }
 }
+
+.auth-button-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 140, 66, 0.2);
+}
+
+.auth-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-user-name {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.auth-signin-btn {
+  background: #ff8c42;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.auth-signin-btn:hover {
+  background: #e67c3a;
+}
+
+.auth-signout-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.auth-signout-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
