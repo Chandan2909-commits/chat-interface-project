@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
-import AuthButton from './components/AuthButton';
 import { Chat, Message } from './types';
 import { supabase } from './lib/supabase';
 
@@ -236,9 +235,6 @@ export default function Home() {
 
   return (
     <div className="chat-container">
-      <div className="auth-button-container">
-        <AuthButton />
-      </div>
       <Sidebar
         chats={chats}
         activeChat={activeChat}
