@@ -11,6 +11,7 @@ interface SkillAnalysisResponse {
   status: 'ready' | 'missing_skills';
   message?: string;
   missing_skills?: MissingSkill[];
+  error?: string;
 }
 
 export default function SkillsPage() {
@@ -30,6 +31,7 @@ export default function SkillsPage() {
     try {
       const skillsArray = formData.skills.split(',').map(s => s.trim()).filter(s => s);
       
+      console.log('Sending request to API...');
       const response = await fetch('/api/get-role-skills', {
         method: 'POST',
         headers: {
@@ -42,11 +44,29 @@ export default function SkillsPage() {
         }),
       });
 
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       console.log('API Response:', data);
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
       setResult(data);
     } catch (error) {
       console.error('Error:', error);
+      setResult({
+        status: 'missing_skills',
+        missing_skills: [{
+          skill: 'Error occurred',
+          video: 'https://www.youtube.com'
+        }]
+      });
     } finally {
       setLoading(false);
     }

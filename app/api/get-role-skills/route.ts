@@ -24,6 +24,11 @@ interface SkillAnalysisResponse {
 
 async function searchWeb(query: string): Promise<string> {
   try {
+    if (!process.env.TAVILY_API_KEY) {
+      console.log('Tavily API key not found, skipping web search');
+      return '';
+    }
+
     const response = await fetch('https://api.tavily.com/search', {
       method: 'POST',
       headers: {
@@ -39,7 +44,8 @@ async function searchWeb(query: string): Promise<string> {
     });
 
     if (!response.ok) {
-      throw new Error('Tavily API request failed');
+      console.error('Tavily API response not ok:', response.status, response.statusText);
+      return '';
     }
 
     const data = await response.json();
@@ -52,13 +58,19 @@ async function searchWeb(query: string): Promise<string> {
 
 async function searchYouTube(skill: string): Promise<string> {
   try {
+    if (!process.env.YOUTUBE_API_KEY) {
+      console.log('YouTube API key not found, using fallback URL');
+      return `https://www.youtube.com/results?search_query=${encodeURIComponent(skill + ' tutorial')}`;
+    }
+
     const query = `${skill} tutorial long form`;
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoDuration=long&order=viewCount&maxResults=1&key=${process.env.YOUTUBE_API_KEY}`
     );
 
     if (!response.ok) {
-      throw new Error('YouTube API request failed');
+      console.error('YouTube API response not ok:', response.status, response.statusText);
+      return `https://www.youtube.com/results?search_query=${encodeURIComponent(skill + ' tutorial')}`;
     }
 
     const data = await response.json();
@@ -68,21 +80,29 @@ async function searchYouTube(skill: string): Promise<string> {
       return `https://www.youtube.com/watch?v=${video.id.videoId}`;
     }
     
-    return '';
+    return `https://www.youtube.com/results?search_query=${encodeURIComponent(skill + ' tutorial')}`;
   } catch (error) {
     console.error('YouTube search failed:', error);
-    return '';
+    return `https://www.youtube.com/results?search_query=${encodeURIComponent(skill + ' tutorial')}`;
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('API called - checking environment variables');
+    console.log('GROQ_API_KEY exists:', !!process.env.GROQ_API_KEY);
+    console.log('YOUTUBE_API_KEY exists:', !!process.env.YOUTUBE_API_KEY);
+    console.log('TAVILY_API_KEY exists:', !!process.env.TAVILY_API_KEY);
+
     const body: SkillAnalysisRequest = await request.json();
     const { role, company, skills } = body;
+    console.log('Request body:', { role, company, skills });
 
     // Search for required skills
     const searchQuery = `skills required for ${role} at ${company}`;
+    console.log('Searching web for:', searchQuery);
     const webResults = await searchWeb(searchQuery);
+    console.log('Web results length:', webResults.length);
 
     // Use Groq to analyze required skills
     const skillsPrompt = `
@@ -100,6 +120,7 @@ Please analyze and respond with:
 Be specific and focus on technical skills only.
 `;
 
+    console.log('Calling Groq API...');
     const completion = await groq.chat.completions.create({
       messages: [
         {
@@ -112,6 +133,7 @@ Be specific and focus on technical skills only.
     });
 
     const aiResponse = completion.choices[0]?.message?.content || '';
+    console.log('AI Response:', aiResponse);
     
     // Extract missing skills from AI response
     let missingSkills: string[] = [];
@@ -122,6 +144,7 @@ Be specific and focus on technical skills only.
         missingSkills = parsed.missing_skills || [];
       }
     } catch (error) {
+      console.log('JSON parsing failed, using fallback');
       // Fallback: extract skills manually from response
       const lines = aiResponse.split('\n');
       missingSkills = lines
@@ -130,6 +153,8 @@ Be specific and focus on technical skills only.
         .filter(skill => skill.length > 0)
         .slice(0, 5);
     }
+
+    console.log('Missing skills:', missingSkills);
 
     if (missingSkills.length === 0) {
       return NextResponse.json({
@@ -142,6 +167,7 @@ Be specific and focus on technical skills only.
     const skillsWithVideos: MissingSkill[] = [];
     
     for (const skill of missingSkills) {
+      console.log('Searching YouTube for:', skill);
       const videoUrl = await searchYouTube(skill);
       if (videoUrl) {
         skillsWithVideos.push({
@@ -151,6 +177,8 @@ Be specific and focus on technical skills only.
       }
     }
 
+    console.log('Final result:', skillsWithVideos);
+
     return NextResponse.json({
       status: 'missing_skills',
       missing_skills: skillsWithVideos
@@ -159,7 +187,7 @@ Be specific and focus on technical skills only.
   } catch (error) {
     console.error('Error in get-role-skills:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     );
   }
