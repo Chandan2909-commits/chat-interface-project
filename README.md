@@ -9,6 +9,7 @@ A beautiful ChatGPT-like interface built with Next.js, featuring a clean white b
 - 📱 Responsive design
 - 🗃️ Chat history storage with Supabase
 - 🤖 AI integration with Groq API
+- 🔍 Skill Gap Analysis with web search and YouTube recommendations
 - 🔄 Easy migration to custom Hugging Face models
 
 ## Setup Instructions
@@ -30,6 +31,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 
 # Groq API Configuration
 GROQ_API_KEY=your_groq_api_key_here
+
+# YouTube API Configuration
+YOUTUBE_API_KEY=your_youtube_api_key_here
+
+# Tavily API Configuration
+TAVILY_API_KEY=your_tavily_api_key_here
 ```
 
 ### 3. Supabase Setup
@@ -38,9 +45,22 @@ GROQ_API_KEY=your_groq_api_key_here
 2. Run the SQL commands from `supabase-schema.sql` in your Supabase SQL editor
 3. Get your project URL and anon key from Supabase dashboard
 
-### 4. Groq API Setup
+### 4. API Setup
 
+**Groq API:**
 1. Sign up at [Groq](https://groq.com/)
+2. Get your API key from the dashboard
+3. Add it to your `.env.local` file
+
+**YouTube API:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing
+3. Enable YouTube Data API v3
+4. Create credentials (API Key)
+5. Add it to your `.env.local` file
+
+**Tavily API:**
+1. Sign up at [Tavily](https://tavily.com/)
 2. Get your API key from the dashboard
 3. Add it to your `.env.local` file
 
@@ -73,8 +93,12 @@ To use your custom fine-tuned model from Hugging Face:
 │   ├── types/
 │   │   └── index.ts         # TypeScript interfaces
 │   ├── api/
-│   │   └── chat/
-│   │       └── route.ts     # Chat API endpoint
+│   │   ├── chat/
+│   │   │   └── route.ts     # Chat API endpoint
+│   │   └── get-role-skills/
+│   │       └── route.ts     # Skill analysis API endpoint
+│   ├── skills/
+│   │   └── page.tsx         # Skill gap analysis page
 │   ├── globals.css          # Global styles
 │   ├── layout.tsx           # Root layout
 │   └── page.tsx             # Main page component
