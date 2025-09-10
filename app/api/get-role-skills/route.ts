@@ -187,7 +187,7 @@ Be specific and focus on technical skills only.
   } catch (error) {
     console.error('Error in get-role-skills:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: (error instanceof Error ? error.message : String(error)) },
       { status: 500 }
     );
   }
