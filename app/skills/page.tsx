@@ -191,10 +191,10 @@ export default function SkillsPage() {
                 transition: 'background-color 0.15s ease'
               }}
               onMouseEnter={(e) => {
-                if (!loading) e.target.style.backgroundColor = '#ea580c';
+                if (!loading) (e.target as HTMLElement).style.backgroundColor = '#ea580c';
               }}
               onMouseLeave={(e) => {
-                if (!loading) e.target.style.backgroundColor = '#f97316';
+                if (!loading) (e.target as HTMLElement).style.backgroundColor = '#f97316';
               }}
             >
               {loading ? 'Analyzing...' : 'Analyze Skills'}
@@ -289,8 +289,8 @@ export default function SkillsPage() {
                                   display: 'inline-block',
                                   transition: 'background-color 0.15s ease'
                                 }}
-                                onMouseEnter={(e) => e.target.style.backgroundColor = '#ea580c'}
-                                onMouseLeave={(e) => e.target.style.backgroundColor = '#f97316'}
+                                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#ea580c'}
+                                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#f97316'}
                               >
                                 Watch Tutorial
                               </a>

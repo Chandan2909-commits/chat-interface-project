@@ -256,8 +256,8 @@ export default function Home() {
               display: 'inline-block',
               transition: 'background-color 0.15s ease'
             }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#e67c3a'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#ff8c42'}
+            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#e67c3a'}
+            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#ff8c42'}
           >
             Skill Gap Analysis
           </a>
